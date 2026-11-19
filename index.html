@@ -145,7 +145,7 @@
     .c-year .months { grid-column:1 / -1; grid-row:2; grid-template-columns:repeat(6,1fr); }
     .c-year .months .m { height:28px; font-size:.75rem; }
     .c-table { min-height:0 !important; } .c-table .wrap { max-height:60vh; }
-    .c-table .sechead { align-items:stretch; } .c-table .tools { width:100%; } .c-table .tools button { width:100%; }
+    .c-table .sechead { align-items:stretch; } .c-table .tools { width:100%; } .c-table .tools button { flex:1; }
     .c-table th { font-size:.78rem; padding:6px 6px 8px; } .c-table td { padding:8px 6px; font-size:.84rem; }
     .badge { display:inline-block; margin:2px 0 0 0; font-size:.68rem; padding:0 7px; }
     .pill { font-size:.72rem; padding:1px 9px; }
@@ -153,6 +153,14 @@
   }
   @media (max-width:380px) { .c-table td, .c-table th { padding-left:4px; padding-right:4px; } .c-table td { font-size:.78rem; } }
   .c-year .yr { white-space:nowrap; }
+  dialog.wide { width:min(560px,94vw); }
+  .hist { display:grid; gap:10px; max-height:58vh; overflow:auto; padding:2px 4px 2px 0; }
+  .hi { border:1px solid var(--edge); border-radius:14px; padding:10px 14px; background:var(--cell); }
+  .hi .top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); }
+  .hi .top b { color:var(--ink); font-weight:500; font-size:.92rem; } .hi .top time { margin-left:auto; }
+  .tag { font-size:.72rem; padding:1px 9px; border-radius:999px; }
+  .tag.add { background:rgba(77,141,255,.18); color:#bcd3ff; } .tag.edit { background:rgba(245,192,74,.18); color:#ffe2a0; } .tag.delete { background:rgba(255,107,107,.2); color:#ffc2c2; }
+  .hi ul { list-style:none; margin:6px 0 0; padding:0; font-size:.88rem; } .hi li { padding:1px 0; } .hi li span { color:var(--muted); } .hi li i { font-style:normal; color:var(--muted); margin:0 4px; }
   /* popup: fits any screen, 16px inputs so phones do not zoom in */
   dialog { width:min(420px,94vw); max-height:92vh; overflow:auto; padding:22px; }
   dialog input[type=number],dialog input[type=date],dialog input[type=password],dialog select { font-size:16px; min-height:44px; }
@@ -231,7 +239,7 @@
 
     <section class="card c-table">
       <div class="sechead"><h2>Manage installments</h2>
-        <div class="tools"><button class="primary" id="record">Record payment</button></div></div>
+        <div class="tools"><button class="ghost" id="history">History</button><button class="primary" id="record">Record payment</button></div></div>
       <div class="wrap"><table>
         <thead><tr><th>Installment</th><th>Due date</th><th style="text-align:right">Amount</th><th>Status</th></tr></thead>
         <tbody id="rows"></tbody></table></div>
@@ -275,7 +283,7 @@ async function load() {
 // ---------- The only place where changes are saved: a popup protected by a password ----------
 function ask(title, body, danger, init) {
   return new Promise((res) => {
-    const d = $("#dlg");
+    const d = $("#dlg"); d.className = "";
     d.innerHTML = `<form method="dialog"><h3>${title}</h3>${body}
       <label>Password<input type="password" name="password" autocomplete="off" placeholder="Enter password to confirm" required></label>
       <div class="act"><button value="ok" class="${danger ? "danger" : "primary"}" disabled>OK</button>
@@ -290,6 +298,32 @@ function ask(title, body, danger, init) {
     d.showModal();
   });
 }
+// History: what was changed, when, from what to what
+async function showHistory() {
+  let list;
+  try {
+    const r = await fetch("/api/history");
+    if (!r.ok) throw new Error((await r.json()).error);
+    list = await r.json();
+  } catch (e) { return toast("Could not load history: " + e.message, true); }
+  const label = { amount: "Amount", dueDate: "Due date", paid: "Status" };
+  const fmt = (f, v) => v === null || v === undefined ? "-" : f === "amount" ? baht(v) : f === "dueDate" ? fmtDate(v) : v ? "Paid" : "Unpaid";
+  const when = (iso) => iso ? new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-";
+  const name = { add: "Added", edit: "Edited", delete: "Deleted" };
+  const lines = (x) => {
+    const b = x.before || {}, a = x.after || {};
+    if (x.action === "edit") return Object.keys(label).filter((f) => (b[f] ?? null) !== (a[f] ?? null)).map((f) => `<li><span>${label[f]}:</span> ${fmt(f, b[f])}<i>&rarr;</i>${fmt(f, a[f])}</li>`);
+    const o = x.action === "add" ? a : b;
+    return Object.keys(label).filter((f) => o[f] !== undefined).map((f) => `<li><span>${label[f]}:</span> ${fmt(f, o[f])}</li>`);
+  };
+  const d = $("#dlg"); d.className = "wide";
+  d.innerHTML = `<form method="dialog"><h3>Change history</h3>
+    <div class="hist num">${list.length ? list.map((x) => `<div class="hi"><div class="top"><span class="tag ${x.action}">${name[x.action] || x.action}</span><b>Installment ${x.period}</b><time>${when(x.at)}</time></div><ul>${lines(x).join("")}</ul></div>`).join("")
+      : '<div class="empty">No history yet. Changes made from now on will appear here.</div>'}</div>
+    <div class="act"><button value="x" class="ghost" formnovalidate>Close</button></div></form>`;
+  d.showModal();
+}
+
 // Record payment: popup with every field editable (password still required)
 const todayLocal = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 async function recordPayment(pre) {
@@ -443,6 +477,7 @@ function render() {
 }
 
 $("#record").addEventListener("click", () => recordPayment());
+$("#history").addEventListener("click", showHistory);
 document.addEventListener("pointermove", (e) => {
   const c = e.target.closest?.(".card"); if (!c) return; const r = c.getBoundingClientRect();
   c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px");

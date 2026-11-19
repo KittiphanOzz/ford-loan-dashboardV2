@@ -19,6 +19,7 @@ admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 const loanRef = admin.firestore().collection("loans").doc(LOAN_ID);
 const instRef = loanRef.collection("installments");
+const histRef = loanRef.collection("history");
 const docId = (p) => String(p).padStart(2, "0");
 
 async function recompute() {
@@ -34,6 +35,15 @@ async function recompute() {
     amountDue: price - amountPaid,
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
+}
+
+// ---- History: every add / edit / delete is saved with the values before and after ----
+const FIELDS = ["amount", "dueDate", "paid"];
+const pick = (o) => (o ? Object.fromEntries(FIELDS.filter((f) => o[f] !== undefined).map((f) => [f, o[f] ?? null])) : null);
+async function logChange(action, period, before, after) {
+  try {
+    await histRef.add({ at: admin.firestore.FieldValue.serverTimestamp(), action, period: Number(period), before: pick(before), after: pick(after) });
+  } catch (e) { console.error("History not saved:", e.message); } // never block the real change
 }
 
 const fail = (res, e, code = 500) => res.status(code).json({ error: e.message ?? e });
@@ -63,6 +73,14 @@ app.get("/api/loan", async (_, res) => {
   } catch (e) { fail(res, e); }
 });
 
+// Change history (newest first, last 100)
+app.get("/api/history", async (_, res) => {
+  try {
+    const snap = await histRef.orderBy("at", "desc").limit(100).get();
+    res.json(snap.docs.map((d) => { const x = d.data(); return { ...x, at: x.at ? x.at.toDate().toISOString() : null }; }));
+  } catch (e) { fail(res, e); }
+});
+
 // Add installment (Insert)
 app.post("/api/installments", async (req, res) => {
   try {
@@ -70,8 +88,10 @@ app.post("/api/installments", async (req, res) => {
     if (!Number.isInteger(period) || period < 1) return fail(res, "Installment number must be a whole number, 1 or higher", 400);
     const data = clean(req.body);
     if (data.amount === undefined) return fail(res, "Enter the amount as a number", 400);
-    await instRef.doc(docId(period)).create({ period, paid: false, dueDate: null, ...data });
+    const doc = { period, paid: false, dueDate: null, ...data };
+    await instRef.doc(docId(period)).create(doc);
     await recompute();
+    await logChange("add", period, null, doc);
     res.json({ ok: true });
   } catch (e) {
     fail(res, e.code === 6 ? `Installment ${req.body.period} already exists` : e, e.code === 6 ? 409 : 500);
@@ -83,8 +103,13 @@ app.patch("/api/installments/:period", async (req, res) => {
   try {
     const data = clean(req.body);
     if (!Object.keys(data).length) return fail(res, "Nothing to update", 400);
-    await instRef.doc(docId(req.params.period)).update(data);
+    const ref = instRef.doc(docId(req.params.period));
+    const snap = await ref.get();
+    if (!snap.exists) return fail(res, `Installment ${req.params.period} not found`, 404);
+    const before = snap.data(), after = { ...before, ...data };
+    await ref.update(data);
     await recompute();
+    if (FIELDS.some((f) => (before[f] ?? null) !== (after[f] ?? null))) await logChange("edit", req.params.period, before, after);
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
@@ -92,8 +117,11 @@ app.patch("/api/installments/:period", async (req, res) => {
 // Delete installment (Delete)
 app.delete("/api/installments/:period", async (req, res) => {
   try {
-    await instRef.doc(docId(req.params.period)).delete();
+    const ref = instRef.doc(docId(req.params.period));
+    const snap = await ref.get();
+    await ref.delete();
     await recompute();
+    if (snap.exists) await logChange("delete", req.params.period, snap.data(), null);
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
