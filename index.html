@@ -160,6 +160,7 @@
   .hi .top b { color:var(--ink); font-weight:500; font-size:.92rem; } .hi .top time { margin-left:auto; }
   .tag { font-size:.72rem; padding:1px 9px; border-radius:999px; }
   .tag.add { background:rgba(77,141,255,.18); color:#bcd3ff; } .tag.edit { background:rgba(245,192,74,.18); color:#ffe2a0; } .tag.delete { background:rgba(255,107,107,.2); color:#ffc2c2; }
+  .tag.edit.paid { background:rgba(52,199,120,.2); color:#9ff0c1; } /* Unpaid -> Paid */
   .hi ul { list-style:none; margin:6px 0 0; padding:0; font-size:.88rem; } .hi li { padding:1px 0; } .hi li span { color:var(--muted); } .hi li i { font-style:normal; color:var(--muted); margin:0 4px; }
   /* popup: fits any screen, 16px inputs so phones do not zoom in */
   dialog { width:min(420px,94vw); max-height:92vh; overflow:auto; padding:22px; }
@@ -318,7 +319,7 @@ async function showHistory() {
   };
   const d = $("#dlg"); d.className = "wide";
   d.innerHTML = `<form method="dialog"><h3>Change history</h3>
-    <div class="hist num">${list.length ? list.map((x) => `<div class="hi"><div class="top"><span class="tag ${x.action}">${name[x.action] || x.action}</span><b>Installment ${x.period}</b><time>${when(x.at)}</time></div><ul>${lines(x).join("")}</ul></div>`).join("")
+    <div class="hist num">${list.length ? list.map((x) => `<div class="hi"><div class="top"><span class="tag ${x.action}${x.action === "edit" && x.before && x.after && x.before.paid === false && x.after.paid === true ? " paid" : ""}">${name[x.action] || x.action}</span><b>Installment ${x.period}</b><time>${when(x.at)}</time></div><ul>${lines(x).join("")}</ul></div>`).join("")
       : '<div class="empty">No history yet. Changes made from now on will appear here.</div>'}</div>
     <div class="act"><button value="x" class="ghost" formnovalidate>Close</button></div></form>`;
   d.showModal();
