@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ford Everest Sport Installments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#060b18; --ink:#eaf0ff; --muted:#8a97b4; --glass:rgba(255,255,255,.045); --edge:rgba(255,255,255,.09);
+    --blue:#4d8dff; --violet:#8b5cf6; --gold:#f5c04a; --red:#ff6b6b; --cell:rgba(255,255,255,.07); color-scheme: dark; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 Prompt,"Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif;
+    background-image:radial-gradient(1200px 500px at 85% -10%,rgba(139,92,246,.16),transparent 60%),radial-gradient(900px 500px at -10% 10%,rgba(77,141,255,.14),transparent 60%); background-attachment:fixed; }
+  main { height:100vh; min-height:760px; padding:22px 32px; display:flex; flex-direction:column; gap:16px; }
+  .num { font-variant-numeric:tabular-nums; }
+  .card { position:relative; background:var(--glass); border:1px solid var(--edge); border-radius:24px; padding:24px; backdrop-filter:blur(14px); overflow:hidden; }
+  .card::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .3s;
+    background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(120,160,255,.13),transparent 70%); }
+  .card:hover::before { opacity:1; }
+  .card > * { position:relative; }
+
+  header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+  h1 { margin:0; font-size:1.7rem; font-weight:600; letter-spacing:-.015em; background:linear-gradient(90deg,#fff,#a9c3ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .chip { padding:6px 16px; border-radius:999px; border:1px solid rgba(245,192,74,.4); background:rgba(245,192,74,.1); color:#ffe2a0; font-size:.9rem; }
+  .chip.done { border-color:rgba(77,141,255,.5); background:rgba(77,141,255,.12); color:#bcd3ff; }
+
+  .hero { display:grid; gap:18px; padding:26px 28px; border-radius:30px; }
+  .hrow { display:flex; justify-content:space-between; align-items:center; gap:14px; }
+  .car { flex:none; filter:drop-shadow(0 8px 16px rgba(110,130,255,.35)); } .car svg { display:block; width:132px; height:auto; }
+  .hname { text-align:right; } .hname b { display:block; font-size:1.25rem; font-weight:600; } .hname span { color:var(--muted); font-size:.9rem; }
+  .cols { display:flex; justify-content:space-between; gap:16px; } .cols .r { text-align:right; }
+  .big { display:block; font-size:1.7rem; font-weight:600; line-height:1.3; }
+  .bar { height:12px; border-radius:999px; background:var(--cell); overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,var(--blue),var(--violet)); box-shadow:0 0 14px rgba(110,130,255,.8); transition:width 1.4s cubic-bezier(.2,.8,.2,1); }
+  .out { margin:0; text-align:center; color:var(--muted); } .out b { color:var(--ink); font-weight:600; font-size:1.35rem; margin-left:8px; }
+  .blob { position:absolute !important; width:340px; height:340px; border-radius:50%; filter:blur(70px); opacity:.5; pointer-events:none; animation:drift 14s ease-in-out infinite alternate; }
+  .b1 { background:#2a5bd7; left:-80px; top:-120px; } .b2 { background:#7c3aed; right:-60px; bottom:-160px; animation-delay:-7s; }
+  @keyframes drift { to { transform:translate(60px,40px) scale(1.15); } }
+  .label { color:var(--muted); font-size:.92rem; }
+  .facts { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding-top:14px; border-top:1px solid var(--edge); } .facts b { display:block; font-size:1.2rem; font-weight:500; }
+
+  .sechead { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  h2 { margin:0; font-size:1.15rem; font-weight:600; } .hint { color:var(--muted); font-size:.9rem; }
+  .years { display:grid; gap:10px; }
+  .year { display:grid; grid-template-columns:70px 1fr 90px; gap:12px; align-items:center; }
+  .yl,.yr { color:var(--muted); font-size:.88rem; } .yr { text-align:right; }
+  .months { display:grid; grid-template-columns:repeat(12,1fr); gap:6px; }
+  .months .m { aspect-ratio:1; min-width:0; border:1px solid var(--edge); border-radius:10px; background:var(--cell); color:var(--muted); font:500 .75rem Prompt,sans-serif; cursor:pointer; padding:0; transition:transform .15s,box-shadow .2s; }
+  .months .m.paid { border-color:transparent; color:#fff; background:linear-gradient(135deg,var(--blue),var(--violet)); box-shadow:0 6px 16px -6px rgba(90,120,255,.8); }
+  .months .m.next { color:#3a2a00; background:var(--gold); border-color:transparent; animation:pulse 2s infinite; }
+  .months .m.pop { animation:pop .5s; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(245,192,74,.6)} 100%{box-shadow:0 0 0 12px rgba(245,192,74,0)} }
+  @keyframes pop { 40%{transform:scale(1.35) rotate(-6deg)} }
+
+  .warn { padding:12px 18px; border-radius:16px; background:rgba(245,192,74,.1); border:1px solid rgba(245,192,74,.3); font-size:.92rem; }
+  .tools { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .tabs { display:inline-flex; background:var(--cell); border-radius:999px; padding:4px; }
+  .tabs button { border:0; background:transparent; color:var(--muted); font:500 .88rem Prompt,sans-serif; padding:6px 14px; border-radius:999px; cursor:pointer; }
+  .tabs button:disabled { opacity:1; cursor:default; }
+  .tabs button.on { background:rgba(255,255,255,.14); color:#fff; }
+  button.primary,button.danger,button.ghost { font:500 .92rem Prompt,sans-serif; border:0; border-radius:999px; padding:9px 20px; cursor:pointer; color:#fff; transition:transform .15s,filter .2s; }
+  button.primary { background:linear-gradient(135deg,var(--blue),var(--violet)); box-shadow:0 8px 20px -8px rgba(110,110,255,.9); }
+  button.danger { background:var(--red); } button.ghost { background:var(--cell); }
+  button.primary:hover,button.danger:hover { transform:translateY(-1px); filter:brightness(1.1); }
+  :focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+  .wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; min-width:560px; }
+  th { text-align:left; font-weight:500; color:var(--muted); font-size:.85rem; padding:6px 10px 10px; }
+  td { padding:8px 10px; border-top:1px solid var(--edge); } tr:hover td { background:rgba(255,255,255,.035); }
+  tr.paid .pno { color:var(--muted); }
+  .badge { font-size:.75rem; padding:1px 9px; border-radius:999px; margin-left:8px; }
+  .badge.next { background:rgba(245,192,74,.18); color:#ffe2a0; } .badge.late { background:var(--red); color:#fff; }
+  .acts { display:flex; gap:6px; justify-content:flex-end; }
+  .acts button { border:1px solid var(--edge); background:transparent; color:var(--muted); border-radius:999px; padding:3px 12px; font:400 .82rem Prompt,sans-serif; cursor:pointer; }
+  .acts button:hover { color:#fff; background:var(--cell); } .acts .del:hover { background:var(--red); border-color:transparent; }
+  .sw { appearance:none; width:40px; height:24px; border-radius:999px; background:var(--cell); border:1px solid var(--edge); position:relative; cursor:pointer; margin:0; transition:background .2s; }
+  .sw::after { content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .2s; }
+  .sw:checked { background:linear-gradient(135deg,var(--blue),var(--violet)); border-color:transparent; } .sw:checked::after { transform:translateX(16px); }
+  .empty { padding:28px; text-align:center; color:var(--muted); }
+
+  dialog { border:1px solid var(--edge); border-radius:24px; background:#0e1730; color:var(--ink); padding:26px; width:min(420px,92vw); box-shadow:0 30px 80px -20px #000; animation:rise .3s cubic-bezier(.2,.9,.3,1.2); }
+  dialog::backdrop { background:rgba(3,6,14,.65); backdrop-filter:blur(6px); }
+  @keyframes rise { from { opacity:0; transform:translateY(20px) scale(.96); } }
+  dialog h3 { margin:0 0 14px; font-size:1.2rem; font-weight:600; } dialog p { color:var(--muted); margin:0 0 6px; }
+  dialog label { display:block; margin-bottom:12px; font-size:.88rem; color:var(--muted); }
+  dialog input[type=number],dialog input[type=date],dialog input[type=password],dialog select { display:block; width:100%; margin-top:4px; font:inherit; color:var(--ink); background:var(--cell); border:1px solid var(--edge); border-radius:12px; padding:9px 12px; }
+  dialog select option { background:#0e1730; color:var(--ink); } dialog .row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  dialog input[readonly] { opacity:.6; } dialog label.chk { display:flex; align-items:center; gap:10px; color:var(--ink); }
+  .act { display:flex; flex-direction:row-reverse; gap:10px; margin-top:18px; }
+
+  #toast { position:fixed; left:50%; bottom:26px; transform:translate(-50%,24px); opacity:0; pointer-events:none; background:#fff; color:#0a1220; padding:10px 20px; border-radius:999px; font-size:.92rem; transition:all .25s; z-index:9; }
+  #toast.show { opacity:1; transform:translate(-50%,0); } #toast.err { background:var(--red); color:#fff; }
+  @media (max-width:720px) { .hero { padding:22px; } .big { font-size:1.4rem; } .year { grid-template-columns:1fr; gap:4px; } .yr { text-align:left; order:2; } }
+  @media (prefers-reduced-motion:reduce) { *,*::before { animation:none !important; transition:none !important; } }
+  button:disabled { opacity:.4; cursor:not-allowed; filter:none !important; transform:none !important; }
+  .pill { font-size:.78rem; padding:2px 12px; border-radius:999px; border:1px solid var(--edge); color:var(--muted); }
+  .pill.paid { color:#bcd3ff; border-color:rgba(77,141,255,.5); background:rgba(77,141,255,.12); }
+  .pwmsg { min-height:1.3em; margin:-6px 0 0 !important; font-size:.82rem; color:var(--red) !important; }
+  .months .m { display:grid; place-items:center; cursor:default; }
+  /* ---- 1920x1080 dashboard layout ---- */
+  header { flex:none; gap:16px; } header h1 { margin-right:auto; } header .warn { padding:6px 14px; font-size:.82rem; }
+  .dash { flex:1; min-height:0; display:grid; gap:20px; grid-template-columns:repeat(12,1fr); grid-template-rows:9fr 10fr; }
+  .hero { grid-column:span 5; align-content:space-between; } .c-curve { grid-column:span 7; } .c-donut { grid-column:span 3; }
+  .c-year { grid-column:span 4; } .c-table { grid-column:span 5; }
+  .dash > .card { padding:20px 22px; min-height:0; } .dash > .card:not(.hero) { display:flex; flex-direction:column; }
+  .dash .sechead { margin-bottom:10px; } .facts b { font-size:1.05rem; }
+  .chart { flex:1; min-height:0; } .chart svg { display:block; width:100%; height:100%; overflow:visible; }
+  .donut { position:relative; flex:1; min-height:0; display:grid; place-items:center; } .donut svg { width:100%; height:100%; }
+  .dArc { transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1); filter:drop-shadow(0 0 8px rgba(110,130,255,.7)); }
+  .dc { position:absolute; text-align:center; } .dc b { display:block; font-size:2.2rem; font-weight:600; line-height:1.1; } .dc span { color:var(--muted); font-size:.85rem; }
+  .legend { list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px; }
+  .legend li { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:.9rem; } .legend b { margin-left:auto; color:var(--ink); font-weight:500; }
+  .legend i { width:10px; height:10px; border-radius:3px; background:var(--cell); } .legend .k1 { background:linear-gradient(135deg,var(--blue),var(--violet)); }
+  .c-year .year { grid-template-columns:50px 1fr 62px; gap:8px; } .c-year .years { gap:8px; margin-top:8px; }
+  .c-year .months { gap:4px; } .c-year .months .m { aspect-ratio:auto; height:24px; font-size:.68rem; border-radius:7px; }
+  .c-table .wrap { flex:1; min-height:0; overflow:auto; } .c-table table { min-width:0; }
+  .c-table th { position:sticky; top:0; background:#0e1730; z-index:1; } .c-table td { padding:6px 10px; }
+  @media (max-width:1279px), (max-height:699px) {
+    main { height:auto; min-height:0; } .dash { display:grid; grid-template-columns:1fr; grid-template-rows:none; }
+    .dash > .card { grid-column:auto; min-height:340px; } .c-table .wrap { max-height:440px; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gLine" x1="0" x2="1"><stop offset="0" stop-color="#4d8dff"/><stop offset="1" stop-color="#b08cff"/></linearGradient>
+  <linearGradient id="gArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4d8dff" stop-opacity=".4"/><stop offset="1" stop-color="#4d8dff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="gBar" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6d9dff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+</defs></svg>
+<main>
+  <header><h1>Car installments</h1><div id="warn"></div><span class="chip" id="chip"></span></header>
+  <div class="dash">
+    <section class="card hero">
+      <i class="blob b1"></i><i class="blob b2"></i>
+      <div class="hrow">
+        <div class="car" role="img" aria-label="Ford Everest 2020, white"><svg viewBox="6 14 232 86" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="evBody" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dce2ee"/></linearGradient>
+            <linearGradient id="evGlass" x1="0" x2="1"><stop offset="0" stop-color="#1b2640"/><stop offset="1" stop-color="#3d4f76"/></linearGradient>
+            <g id="evWheel"><circle r="17" fill="#141926"/><circle r="11" fill="#e3e8f2"/><circle r="8" fill="#c9d1e0"/>
+              <path d="M0 -8V8M-8 0H8M-5.7 -5.7L5.7 5.7M5.7 -5.7L-5.7 5.7" stroke="#8e98ad" stroke-width="1.6"/><circle r="3" fill="#8e98ad"/></g>
+          </defs>
+          <ellipse cx="122" cy="93" rx="110" ry="4.5" fill="rgba(0,0,0,.45)"/>
+          <path d="M36 20L148 19" stroke="#aeb9cf" stroke-width="3" stroke-linecap="round"/>
+          <path d="M16 74L13 52Q13 38 21 30L31 24L150 22Q162 22 170 29L191 46L219 50Q229 52 229 61L229 74Z" fill="url(#evBody)" stroke="#c3cbdb" stroke-width=".8"/>
+          <path d="M16 67H229V74H16Z" fill="#b9c2d4"/>
+          <path d="M33 46L38 30L148 28Q157 28 162 32L181 46Z" fill="url(#evGlass)"/>
+          <rect x="76" y="28" width="5" height="18" fill="#f1f4fa"/><rect x="114" y="28" width="5" height="18" fill="#f1f4fa"/>
+          <path d="M18 47H190M78 47V66M116 47V66" stroke="#c3cbdb" stroke-width="1"/>
+          <rect x="86" y="50" width="10" height="2.5" rx="1.2" fill="#aeb8cc"/><rect x="124" y="50" width="10" height="2.5" rx="1.2" fill="#aeb8cc"/>
+          <path d="M168 38H176V43H169Z" fill="#e7ebf3" stroke="#c3cbdb" stroke-width=".6"/>
+          <path d="M205 51L226 53V58L208 57Z" fill="#f6e9b8"/><rect x="224" y="57" width="5" height="8" fill="#6f7a91"/><rect x="217" y="64" width="12" height="3" fill="#8b95aa"/>
+          <rect x="13" y="40" width="4" height="11" rx="1.5" fill="#e0525a"/>
+          <circle cx="62" cy="72" r="21" fill="#0a1226"/><circle cx="184" cy="72" r="21" fill="#0a1226"/>
+          <use href="#evWheel" x="62" y="72"/><use href="#evWheel" x="184" y="72"/>
+        </svg></div>
+        <div class="hname"><b id="hName">Loading...</b><span>Vehicle price <span id="fPrice"></span></span></div>
+      </div>
+      <div class="cols num">
+        <div><span class="label">Paid already</span><b class="big"><span id="pMonths">0</span> months</b></div>
+        <div class="r"><span class="label">Remaining</span><b class="big"><span id="rMonths">0</span> months</b></div>
+      </div>
+      <div class="bar" role="progressbar" aria-label="Installments paid"><i id="fill"></i></div>
+      <p class="out">Total outstanding amount<b class="num" id="out">฿0.00</b></p>
+      <div class="facts num">
+        <div><span class="label">Paid so far</span><b id="fPaid"></b></div>
+        <div><span class="label">Monthly payment</span><b id="fMonthly"></b></div>
+        <div><span class="label">Plan length</span><b id="fTotal"></b></div>
+        <div><span class="label">Overdue</span><b id="fLate"></b></div>
+      </div>
+    </section>
+
+    <section class="card c-curve">
+      <div class="sechead"><h2>Balance over time</h2><span class="hint" id="cRead">Hover the chart for details</span></div>
+      <div class="chart" id="curve"></div>
+    </section>
+
+    <section class="card c-donut">
+      <div class="sechead"><h2>Amount split</h2></div>
+      <div class="donut"><svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="76" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="22"/>
+        <circle class="dArc" id="dArc" cx="100" cy="100" r="76" fill="none" stroke="url(#gLine)" stroke-width="22" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 100 100)"/></svg>
+        <div class="dc"><b class="num" id="dPct">0%</b><span>of price paid</span></div></div>
+      <ul class="legend num"><li><i class="k1"></i>Paid<b id="lPaid"></b></li><li><i></i>Outstanding<b id="lDue"></b></li><li>Price<b id="lPrice"></b></li></ul>
+    </section>
+
+    <section class="card c-year">
+      <div class="sechead"><h2>Yearly overview</h2><span class="hint">Solid is paid, light is unpaid</span></div>
+      <div class="chart" id="ybars"></div>
+      <div class="years" id="years"></div>
+    </section>
+
+    <section class="card c-table">
+      <div class="sechead"><h2>Manage installments</h2>
+        <div class="tools"><button class="primary" id="record">Record payment</button></div></div>
+      <div class="wrap"><table>
+        <thead><tr><th>Installment</th><th>Due date</th><th style="text-align:right">Amount</th><th>Status</th></tr></thead>
+        <tbody id="rows"></tbody></table></div>
+    </section>
+  </div>
+</main>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const PASSWORD = "1234";
+const baht = (n) => "฿" + Number(n).toLocaleString("en-US");
+const fmtDate = (iso) => iso ? new Date(iso + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
+let state, popped = null, scrollNext = true;
+const shown = { pn: 0, rn: 0, due: 0, paid: 0 };
+const baht2 = (n) => "฿" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function toast(text, err) {
+  const t = $("#toast"); t.textContent = text; t.className = "show" + (err ? " err" : "");
+  clearTimeout(toast.id); toast.id = setTimeout(() => (t.className = ""), 2400);
+}
+
+// ---------- API (Insert / Update / Delete) ----------
+async function api(method, period, body, okMsg) {
+  try {
+    const r = await fetch("/api/installments" + (period ? "/" + period : ""), {
+      method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error((await r.json()).error);
+    popped = method === "DELETE" ? null : period || body.period; scrollNext = true;
+    await load(); toast(okMsg);
+  } catch (e) { toast(e.message, true); }
+}
+async function load() {
+  try {
+    const r = await fetch("/api/loan");
+    if (!r.ok) throw new Error((await r.json()).error);
+    state = await r.json(); render();
+  } catch (e) { toast("Could not load data: " + e.message, true); }
+}
+
+// ---------- The only place where changes are saved: a popup protected by a password ----------
+function ask(title, body, danger, init) {
+  return new Promise((res) => {
+    const d = $("#dlg");
+    d.innerHTML = `<form method="dialog"><h3>${title}</h3>${body}
+      <label>Password<input type="password" name="password" autocomplete="off" placeholder="Enter password to confirm" required></label>
+      <p class="pwmsg" id="pwmsg"></p>
+      <div class="act"><button value="ok" class="${danger ? "danger" : "primary"}" disabled>OK</button>
+      <button value="x" class="ghost" formnovalidate>Cancel</button></div></form>`;
+    const ok = d.querySelector("button[value=ok]"), pw = d.querySelector("[name=password]");
+    d.extraValid = null;
+    d.recheck = () => { ok.disabled = !(pw.value === PASSWORD && (!d.extraValid || d.extraValid())); };
+    pw.oninput = () => {
+      d.recheck();
+      $("#pwmsg").textContent = pw.value.length >= PASSWORD.length && pw.value !== PASSWORD ? "Incorrect password" : "";
+    };
+    if (init) init(d);
+    d.returnValue = "";
+    d.onclose = () => res(d.returnValue === "ok" ? new FormData(d.querySelector("form")) : null);
+    d.showModal();
+  });
+}
+// Record payment: popup with every field editable (password still required)
+const todayLocal = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+async function recordPayment() {
+  const all = state.installments;
+  if (!all.length) return toast("No installments yet", true);
+  const next = all.find((i) => !i.paid) || all[all.length - 1];
+  const nextOpen = all.find((i) => !i.paid);
+  const fd = await ask("Record payment",
+    `<label>Installment no.<input type="number" name="period" min="1" step="1" value="${next.period}" required></label>
+     <p class="pwmsg" id="pmsg"></p>
+     <label>Amount (THB)<input type="number" name="amount" min="0" step="0.01" value="${next.amount ?? ""}" required></label>
+     <label>Due date<input type="date" name="dueDate" value="${next === nextOpen ? todayLocal() : next.dueDate || ""}"></label>
+     <label class="chk"><input type="checkbox" class="sw" name="paid" ${next === nextOpen || next.paid ? "checked" : ""}> Mark as paid</label>`,
+    false,
+    (d) => {
+      const q = (n) => d.querySelector(`[name=${n}]`);
+      const find = () => all.find((i) => String(i.period) === q("period").value.trim());
+      d.extraValid = () => !!find();
+      q("period").oninput = () => {
+        const it = find();
+        $("#pmsg").textContent = it || !q("period").value ? "" : "Installment not found";
+        if (it) { // any installment can be picked, including past ones: its saved values are loaded
+          q("amount").value = it.amount ?? "";
+          q("dueDate").value = it === nextOpen ? todayLocal() : it.dueDate || "";
+          q("paid").checked = it === nextOpen ? true : !!it.paid;
+        }
+        d.recheck();
+      };
+    });
+  if (!fd) return;
+  const period = fd.get("period").trim();
+  api("PATCH", period, {
+    paid: fd.get("paid") === "on",
+    amount: Number(fd.get("amount")),
+    dueDate: fd.get("dueDate") || null,
+    password: fd.get("password"),
+  }, `Installment ${period} saved`);
+}
+
+// ---------- Rendering ----------
+function tween(key, to, fn) {
+  const from = shown[key]; shown[key] = to; const t0 = performance.now();
+  (function f(t) { const k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3); fn(from + (to - from) * e); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+
+
+const K = (n) => "฿" + (n >= 1e6 ? +(n / 1e6).toFixed(2) + "M" : Math.round(n / 1e3) + "K");
+
+function drawCurve(list, price) {
+  const el = $("#curve"), w = el.clientWidth, h = el.clientHeight; if (w < 80 || h < 80) return;
+  const L = 52, R = 14, T = 12, B = 28, pw = w - L - R, ph = h - T - B, n = list.length;
+  let k = list.findIndex((i) => !i.paid); if (k < 0) k = n;
+  const bal = [price]; list.forEach((i) => bal.push(bal.at(-1) - (i.amount ?? 0)));
+  const x = (i) => L + (i / n) * pw, y = (v) => T + (1 - Math.max(0, v) / price) * ph;
+  const path = (a, b) => { let d = ""; for (let i = a; i <= b; i++) d += (i === a ? "M" : "L") + x(i).toFixed(1) + " " + y(bal[i]).toFixed(1); return d; };
+  let g = "";
+  for (let t = 0; t <= 4; t++) { const v = price * t / 4;
+    g += `<line x1="${L}" x2="${w - R}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" fill="#8a97b4" font-size="11">${K(v)}</text>`; }
+  for (let i = 0; i <= n; i += 12) g += `<text x="${x(i)}" y="${h - 8}" text-anchor="middle" fill="#8a97b4" font-size="11">${i}</text>`;
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}">${g}
+    <path d="${path(0, k)} L ${x(k)} ${y(0)} L ${x(0)} ${y(0)} Z" fill="url(#gArea)"/>
+    <path d="${path(0, k)}" fill="none" stroke="url(#gLine)" stroke-width="3" stroke-linecap="round"/>
+    <path d="${path(k, n)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="5 6"/>
+    <circle cx="${x(k)}" cy="${y(bal[k])}" r="6" fill="#f5c04a"/><circle cx="${x(k)}" cy="${y(bal[k])}" r="12" fill="none" stroke="#f5c04a" opacity=".4"/>
+    <line id="cv" y1="${T}" y2="${T + ph}" stroke="rgba(255,255,255,.35)" style="opacity:0"/><circle id="cd" r="5" fill="#fff" style="opacity:0"/>
+    <rect id="chit" x="${L}" y="${T}" width="${pw}" height="${ph}" fill="transparent"/></svg>`;
+  const hit = $("#chit"), line = $("#cv"), dot = $("#cd");
+  hit.onpointermove = (e) => {
+    const r = hit.getBoundingClientRect(), i = Math.max(0, Math.min(n, Math.round(((e.clientX - r.left) / r.width) * n)));
+    line.setAttribute("x1", x(i)); line.setAttribute("x2", x(i)); dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(bal[i]));
+    line.style.opacity = dot.style.opacity = 1;
+    $("#cRead").textContent = i ? `Installment ${list[i - 1].period}: balance ${baht(bal[i])}, due ${fmtDate(list[i - 1].dueDate)}` : `Start: ${baht(price)}`;
+  };
+  hit.onpointerleave = () => { line.style.opacity = dot.style.opacity = 0; $("#cRead").textContent = "Hover the chart for details"; };
+}
+
+function drawYears(list) {
+  const el = $("#ybars"), w = el.clientWidth, h = el.clientHeight; if (w < 80 || h < 60) return;
+  const ys = [];
+  for (let y = 0; y * 12 < list.length; y++) {
+    const p = list.slice(y * 12, y * 12 + 12);
+    ys.push({ paid: p.filter((i) => i.paid).reduce((s, i) => s + i.amount, 0), open: p.filter((i) => !i.paid).reduce((s, i) => s + i.amount, 0) });
+  }
+  const max = Math.max(1, ...ys.map((a) => a.paid + a.open)), T = 22, B = 22, ph = h - T - B, bw = Math.min(56, (w / ys.length) * .5), base = T + ph;
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}">` + ys.map((a, i) => {
+    const cx = (i + .5) * (w / ys.length), hp = (a.paid / max) * ph, ho = (a.open / max) * ph;
+    return `<rect x="${cx - bw / 2}" y="${base - hp - ho}" width="${bw}" height="${ho}" rx="6" fill="rgba(255,255,255,.1)"/>
+      <rect x="${cx - bw / 2}" y="${base - hp}" width="${bw}" height="${hp}" rx="6" fill="url(#gBar)"/>
+      <text x="${cx}" y="${base - hp - ho - 6}" text-anchor="middle" fill="#cfd8ee" font-size="11">${K(a.paid + a.open)}</text>
+      <text x="${cx}" y="${h - 6}" text-anchor="middle" fill="#8a97b4" font-size="11">Year ${i + 1}</text>`;
+  }).join("") + `</svg>`;
+}
+
+function render() {
+  const { loan, installments: list } = state;
+  const next = list.find((i) => !i.paid);
+  const total = list.reduce((s, i) => s + (i.amount ?? 0), 0);
+  const today = new Date().toISOString().slice(0, 10);
+  const pct = loan.totalPeriods ? Math.round((loan.paidPeriods / loan.totalPeriods) * 100) : 0;
+
+  $("#hName").textContent = loan.title;
+  $("#chip").className = "chip" + (next ? "" : " done");
+  $("#chip").textContent = next ? `Next payment: installment ${next.period}` + (next.dueDate ? `, due ${fmtDate(next.dueDate)}` : "") : "All installments paid";
+  $("#fPrice").textContent = baht(loan.price);
+  const freq = {}; list.forEach((i) => (freq[i.amount] = (freq[i.amount] || 0) + 1));
+  $("#fMonthly").textContent = baht(+Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0] || 0);
+  $("#fTotal").textContent = loan.totalPeriods + " months";
+  $("#fLate").textContent = list.filter((i) => !i.paid && i.dueDate && i.dueDate < today).length + " installments";
+  const frac = loan.price ? Math.min(1, loan.amountPaid / loan.price) : 0;
+  $("#dArc").setAttribute("stroke-dashoffset", 100 - frac * 100);
+  $("#dPct").textContent = Math.round(frac * 100) + "%";
+  $("#lPaid").textContent = baht(loan.amountPaid); $("#lDue").textContent = baht(loan.amountDue); $("#lPrice").textContent = baht(loan.price);
+  drawCurve(list, loan.price); drawYears(list);
+  $("#fill").style.width = pct + "%";
+  tween("pn", loan.paidPeriods, (v) => ($("#pMonths").textContent = Math.round(v)));
+  tween("rn", loan.remainingPeriods, (v) => ($("#rMonths").textContent = Math.round(v)));
+  tween("due", loan.amountDue, (v) => ($("#out").textContent = baht2(v)));
+  tween("paid", loan.amountPaid, (v) => ($("#fPaid").textContent = baht(Math.round(v))));
+  $("#record").disabled = !list.length;
+
+  $("#warn").innerHTML = total !== loan.price
+    ? `<div class="warn">Installments add up to ${baht(total)}, ${baht(Math.abs(loan.price - total))} off the price of ${baht(loan.price)}.</div>` : "";
+
+  let years = "";
+  for (let y = 0; y * 12 < list.length; y++) {
+    const part = list.slice(y * 12, y * 12 + 12);
+    years += `<div class="year"><span class="yl">Year ${y + 1}</span><div class="months">${part.map((i) =>
+      `<span class="m ${i.paid ? "paid" : i === next ? "next" : ""} ${i.period == popped ? "pop" : ""}" title="Installment ${i.period}: ${baht(i.amount)}, due ${fmtDate(i.dueDate)}" aria-label="Installment ${i.period}, ${i.paid ? "paid" : "unpaid"}">${i.period}</span>`).join("")}</div>
+      <span class="yr num">${part.filter((i) => i.paid).length}/${part.length} paid</span></div>`;
+  }
+  $("#years").innerHTML = years || `<div class="empty">No installments yet. Click "+ Add installment" to start.</div>`;
+
+
+  const rows = list;
+  $("#rows").innerHTML = rows.length ? rows.map((i) => {
+    const late = !i.paid && i.dueDate && i.dueDate < today;
+    return `<tr class="${i.paid ? "paid" : ""} ${i === next ? "nextrow" : ""}" data-p="${i.period}">
+      <td class="pno num">Installment ${i.period}${late ? '<span class="badge late">Overdue</span>' : i === next ? '<span class="badge next">Next</span>' : ""}</td>
+      <td class="num">${fmtDate(i.dueDate)}</td><td class="num" style="text-align:right">${baht(i.amount)}</td>
+      <td><span class="pill ${i.paid ? "paid" : ""}">${i.paid ? "Paid" : "Unpaid"}</span></td>
+      </tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">No installments yet</td></tr>`;
+  popped = null;
+  if (scrollNext) { // on open (and after saving) jump to the next installment to pay; the rest stays scrollable
+    scrollNext = false;
+    requestAnimationFrame(() => {
+      const w = document.querySelector(".c-table .wrap"), r = $("#rows tr.nextrow");
+      if (!w) return;
+      if (r) w.scrollTop += r.getBoundingClientRect().top - w.getBoundingClientRect().top - w.querySelector("thead").offsetHeight;
+      else w.scrollTop = w.scrollHeight;
+    });
+  }
+}
+
+$("#record").addEventListener("click", recordPayment);
+document.addEventListener("pointermove", (e) => {
+  const c = e.target.closest?.(".card"); if (!c) return; const r = c.getBoundingClientRect();
+  c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px");
+});
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => state && render(), 150); });
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "everest-firebase-upload",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dry-run": "node upload.js --dry-run",
+    "upload": "node upload.js",
+    "web": "node server.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.21.0",
+    "firebase-admin": "^12.7.0"
+  }
+}
