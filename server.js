@@ -1,5 +1,5 @@
 // Installment manager web app (add / edit / delete)  ->  npm run web, then open http://localhost:3000
-// Connects to Firestore with serviceAccountKey.json and only accepts connections from this computer
+// Connects to Firestore. Locally it reads serviceAccountKey.json; online (Render) it reads the FIREBASE_KEY environment variable
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,13 +8,15 @@ import admin from "firebase-admin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOAN_ID = "ford-everest-sport-2020";
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+// Online hosts set PORT and need 0.0.0.0; on your own computer keep it local-only
+const HOST = process.env.PORT ? "0.0.0.0" : "127.0.0.1";
 
-admin.initializeApp({
-  credential: admin.credential.cert(
-    JSON.parse(fs.readFileSync(path.join(__dirname, "serviceAccountKey.json"), "utf8"))
-  ),
-});
+const serviceAccount = process.env.FIREBASE_KEY
+  ? JSON.parse(process.env.FIREBASE_KEY)
+  : JSON.parse(fs.readFileSync(path.join(__dirname, "serviceAccountKey.json"), "utf8"));
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+
 const loanRef = admin.firestore().collection("loans").doc(LOAN_ID);
 const instRef = loanRef.collection("installments");
 const docId = (p) => String(p).padStart(2, "0");
@@ -47,6 +49,7 @@ const app = express();
 app.use(express.json());
 
 // Every change (POST / PATCH / DELETE) must include the password
+// Online: set EDIT_PASSWORD in the host's Environment Variables (the "1234" fallback is for local use only)
 const PASSWORD = process.env.EDIT_PASSWORD ?? "1234";
 app.use("/api", (req, res, next) =>
   req.method === "GET" || req.body?.password === PASSWORD ? next() : res.status(403).json({ error: "Incorrect password" }));
@@ -95,4 +98,4 @@ app.delete("/api/installments/:period", async (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
-app.listen(PORT, "127.0.0.1", () => console.log(`Open the site at http://localhost:${PORT}`));
+app.listen(PORT, HOST, () => console.log(`Server running on port ${PORT}`));
