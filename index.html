@@ -120,6 +120,44 @@
     main { height:auto; min-height:0; } .dash { display:grid; grid-template-columns:1fr; grid-template-rows:none; }
     .dash > .card { grid-column:auto; min-height:340px; } .c-table .wrap { max-height:440px; }
   }
+
+  /* ---- Responsive: desktop (>=1280 wide) keeps the 1920x1080 dashboard; below that it adapts ---- */
+  @media (min-width:720px) and (max-width:1279px) {
+    main { padding:18px 20px; }
+    .dash { grid-template-columns:1fr 1fr; gap:16px; }
+    .dash > .hero, .dash > .c-curve, .dash > .c-table { grid-column:1 / -1; }
+    .dash > .c-donut, .dash > .c-year { grid-column:auto; }
+    .c-table .wrap { max-height:520px; }
+  }
+  @media (max-width:719px) {
+    main { padding:14px 12px 24px; gap:12px; }
+    header { gap:8px; } h1 { font-size:1.3rem; } .chip { font-size:.8rem; padding:5px 12px; }
+    .dash { gap:12px; }
+    .hero { padding:18px; gap:14px; border-radius:24px; }
+    .car svg { width:104px; } .hname b { font-size:1.05rem; } .hname span { font-size:.8rem; }
+    .big { font-size:1.2rem; } .out b { font-size:1.15rem; display:block; margin:2px 0 0; }
+    .facts { grid-template-columns:1fr 1fr; gap:12px; } .facts b { font-size:.95rem; }
+    .dash > .card { padding:16px; min-height:260px; border-radius:20px; } .dash > .hero { min-height:0; }
+    .c-donut { min-height:320px !important; }
+    .c-year { min-height:0 !important; } .c-year .chart { flex:none; height:160px; }
+    .c-year .year { grid-template-columns:1fr auto; gap:6px 8px; }
+    .c-year .yl { grid-column:1; grid-row:1; } .c-year .yr { grid-column:2; grid-row:1; order:0; text-align:right; }
+    .c-year .months { grid-column:1 / -1; grid-row:2; grid-template-columns:repeat(6,1fr); }
+    .c-year .months .m { height:28px; font-size:.75rem; }
+    .c-table { min-height:0 !important; } .c-table .wrap { max-height:60vh; }
+    .c-table .sechead { align-items:stretch; } .c-table .tools { width:100%; } .c-table .tools button { width:100%; }
+    .c-table th { font-size:.78rem; padding:6px 6px 8px; } .c-table td { padding:8px 6px; font-size:.84rem; }
+    .badge { display:inline-block; margin:2px 0 0 0; font-size:.68rem; padding:0 7px; }
+    .pill { font-size:.72rem; padding:1px 9px; }
+    #cRead { display:none; }
+  }
+  @media (max-width:380px) { .c-table td, .c-table th { padding-left:4px; padding-right:4px; } .c-table td { font-size:.78rem; } }
+  .c-year .yr { white-space:nowrap; }
+  /* popup: fits any screen, 16px inputs so phones do not zoom in */
+  dialog { width:min(420px,94vw); max-height:92vh; overflow:auto; padding:22px; }
+  dialog input[type=number],dialog input[type=date],dialog input[type=password],dialog select { font-size:16px; min-height:44px; }
+  #toast { max-width:92vw; text-align:center; }
+  @media (pointer:coarse) { button.primary,button.danger,button.ghost { min-height:44px; } .act button { flex:1; } }
 </style>
 </head>
 <body>
@@ -205,7 +243,6 @@
 
 <script>
 const $ = (s) => document.querySelector(s);
-const PASSWORD = "1234";
 const baht = (n) => "฿" + Number(n).toLocaleString("en-US");
 const fmtDate = (iso) => iso ? new Date(iso + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 let state, popped = null, scrollNext = true;
@@ -224,8 +261,8 @@ async function api(method, period, body, okMsg) {
       method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (!r.ok) throw new Error((await r.json()).error);
     popped = method === "DELETE" ? null : period || body.period; scrollNext = true;
-    await load(); toast(okMsg);
-  } catch (e) { toast(e.message, true); }
+    await load(); toast(okMsg); return true;
+  } catch (e) { api.err = e.message; toast(e.message, true); return false; }
 }
 async function load() {
   try {
@@ -241,16 +278,12 @@ function ask(title, body, danger, init) {
     const d = $("#dlg");
     d.innerHTML = `<form method="dialog"><h3>${title}</h3>${body}
       <label>Password<input type="password" name="password" autocomplete="off" placeholder="Enter password to confirm" required></label>
-      <p class="pwmsg" id="pwmsg"></p>
       <div class="act"><button value="ok" class="${danger ? "danger" : "primary"}" disabled>OK</button>
       <button value="x" class="ghost" formnovalidate>Cancel</button></div></form>`;
     const ok = d.querySelector("button[value=ok]"), pw = d.querySelector("[name=password]");
     d.extraValid = null;
-    d.recheck = () => { ok.disabled = !(pw.value === PASSWORD && (!d.extraValid || d.extraValid())); };
-    pw.oninput = () => {
-      d.recheck();
-      $("#pwmsg").textContent = pw.value.length >= PASSWORD.length && pw.value !== PASSWORD ? "Incorrect password" : "";
-    };
+    d.recheck = () => { ok.disabled = !(pw.value.length > 0 && (!d.extraValid || d.extraValid())); };
+    pw.oninput = () => d.recheck();
     if (init) init(d);
     d.returnValue = "";
     d.onclose = () => res(d.returnValue === "ok" ? new FormData(d.querySelector("form")) : null);
@@ -259,17 +292,18 @@ function ask(title, body, danger, init) {
 }
 // Record payment: popup with every field editable (password still required)
 const todayLocal = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
-async function recordPayment() {
+async function recordPayment(pre) {
   const all = state.installments;
   if (!all.length) return toast("No installments yet", true);
-  const next = all.find((i) => !i.paid) || all[all.length - 1];
   const nextOpen = all.find((i) => !i.paid);
+  const first = nextOpen || all[all.length - 1];
+  const v = pre || { period: first.period, amount: first.amount ?? "", dueDate: first === nextOpen ? todayLocal() : first.dueDate || "", paid: first === nextOpen || !!first.paid };
   const fd = await ask("Record payment",
-    `<label>Installment no.<input type="number" name="period" min="1" step="1" value="${next.period}" required></label>
+    `<label>Installment no.<input type="number" name="period" min="1" step="1" inputmode="numeric" value="${v.period}" required></label>
      <p class="pwmsg" id="pmsg"></p>
-     <label>Amount (THB)<input type="number" name="amount" min="0" step="0.01" value="${next.amount ?? ""}" required></label>
-     <label>Due date<input type="date" name="dueDate" value="${next === nextOpen ? todayLocal() : next.dueDate || ""}"></label>
-     <label class="chk"><input type="checkbox" class="sw" name="paid" ${next === nextOpen || next.paid ? "checked" : ""}> Mark as paid</label>`,
+     <label>Amount (THB)<input type="number" name="amount" min="0" step="0.01" inputmode="decimal" value="${v.amount}" required></label>
+     <label>Due date<input type="date" name="dueDate" value="${v.dueDate}"></label>
+     <label class="chk"><input type="checkbox" class="sw" name="paid" ${v.paid ? "checked" : ""}> Mark as paid</label>`,
     false,
     (d) => {
       const q = (n) => d.querySelector(`[name=${n}]`);
@@ -288,12 +322,9 @@ async function recordPayment() {
     });
   if (!fd) return;
   const period = fd.get("period").trim();
-  api("PATCH", period, {
-    paid: fd.get("paid") === "on",
-    amount: Number(fd.get("amount")),
-    dueDate: fd.get("dueDate") || null,
-    password: fd.get("password"),
-  }, `Installment ${period} saved`);
+  const body = { paid: fd.get("paid") === "on", amount: Number(fd.get("amount")), dueDate: fd.get("dueDate") || null };
+  const ok = await api("PATCH", period, { ...body, password: fd.get("password") }, `Installment ${period} saved`);
+  if (!ok && api.err === "Incorrect password") recordPayment({ period, amount: fd.get("amount"), dueDate: fd.get("dueDate") || "", paid: body.paid }); // try again, nothing retyped
 }
 
 // ---------- Rendering ----------
@@ -411,7 +442,7 @@ function render() {
   }
 }
 
-$("#record").addEventListener("click", recordPayment);
+$("#record").addEventListener("click", () => recordPayment());
 document.addEventListener("pointermove", (e) => {
   const c = e.target.closest?.(".card"); if (!c) return; const r = c.getBoundingClientRect();
   c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px");
