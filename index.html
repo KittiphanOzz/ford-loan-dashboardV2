@@ -214,7 +214,7 @@
         <div><span class="label">Paid so far</span><b id="fPaid"></b></div>
         <div><span class="label">Monthly payment</span><b id="fMonthly"></b></div>
         <div><span class="label">Plan length</span><b id="fTotal"></b></div>
-        <div><span class="label">Overdue</span><b id="fLate"></b></div>
+        <div><span class="label">Last payment</span><b id="fLast"></b></div>
       </div>
     </section>
 
@@ -242,7 +242,7 @@
       <div class="sechead"><h2>Manage installments</h2>
         <div class="tools"><button class="ghost" id="history">History</button><button class="primary" id="record">Record payment</button></div></div>
       <div class="wrap"><table>
-        <thead><tr><th>Installment</th><th>Due date</th><th style="text-align:right">Amount</th><th>Status</th></tr></thead>
+        <thead><tr><th>Installment</th><th>Payment date</th><th style="text-align:right">Amount</th><th>Status</th></tr></thead>
         <tbody id="rows"></tbody></table></div>
     </section>
   </div>
@@ -307,7 +307,7 @@ async function showHistory() {
     if (!r.ok) throw new Error((await r.json()).error);
     list = await r.json();
   } catch (e) { return toast("Could not load history: " + e.message, true); }
-  const label = { amount: "Amount", dueDate: "Due date", paid: "Status" };
+  const label = { amount: "Amount", dueDate: "Payment date", paid: "Status" };
   const fmt = (f, v) => v === null || v === undefined ? "-" : f === "amount" ? baht(v) : f === "dueDate" ? fmtDate(v) : v ? "Paid" : "Unpaid";
   const when = (iso) => iso ? new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-";
   const name = { add: "Added", edit: "Edited", delete: "Deleted" };
@@ -337,27 +337,32 @@ async function recordPayment(pre) {
     `<label>Installment no.<input type="number" name="period" min="1" step="1" inputmode="numeric" value="${v.period}" required></label>
      <p class="pwmsg" id="pmsg"></p>
      <label>Amount (THB)<input type="number" name="amount" min="0" step="0.01" inputmode="decimal" value="${v.amount}" required></label>
-     <label>Due date<input type="date" name="dueDate" value="${v.dueDate}"></label>
+     <label>Payment date<input type="date" name="dueDate" value="${v.paid ? v.dueDate : ""}" ${v.paid ? "" : "disabled"}></label>
      <label class="chk"><input type="checkbox" class="sw" name="paid" ${v.paid ? "checked" : ""}> Mark as paid</label>`,
     false,
     (d) => {
       const q = (n) => d.querySelector(`[name=${n}]`);
       const find = () => all.find((i) => String(i.period) === q("period").value.trim());
       d.extraValid = () => !!find();
+      // the date only exists for a paid installment: switch off "Mark as paid" and it is cleared
+      const sync = (fill) => { const on = q("paid").checked, dt = q("dueDate"); dt.disabled = !on; if (!on) dt.value = ""; else if (fill && !dt.value) dt.value = todayLocal(); };
+      q("paid").onchange = () => sync(true);
       q("period").oninput = () => {
         const it = find();
         $("#pmsg").textContent = it || !q("period").value ? "" : "Installment not found";
         if (it) { // any installment can be picked, including past ones: its saved values are loaded
           q("amount").value = it.amount ?? "";
-          q("dueDate").value = it === nextOpen ? todayLocal() : it.dueDate || "";
           q("paid").checked = it === nextOpen ? true : !!it.paid;
+          q("dueDate").value = it === nextOpen ? todayLocal() : it.paid ? it.dueDate || "" : "";
+          sync(false);
         }
         d.recheck();
       };
     });
   if (!fd) return;
   const period = fd.get("period").trim();
-  const body = { paid: fd.get("paid") === "on", amount: Number(fd.get("amount")), dueDate: fd.get("dueDate") || null };
+  const paid = fd.get("paid") === "on";
+  const body = { paid, amount: Number(fd.get("amount")), dueDate: paid ? fd.get("dueDate") || null : null };
   const ok = await api("PATCH", period, { ...body, password: fd.get("password") }, `Installment ${period} saved`);
   if (!ok && api.err === "Incorrect password") recordPayment({ period, amount: fd.get("amount"), dueDate: fd.get("dueDate") || "", paid: body.paid }); // try again, nothing retyped
 }
@@ -394,7 +399,7 @@ function drawCurve(list, price) {
     const r = hit.getBoundingClientRect(), i = Math.max(0, Math.min(n, Math.round(((e.clientX - r.left) / r.width) * n)));
     line.setAttribute("x1", x(i)); line.setAttribute("x2", x(i)); dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(bal[i]));
     line.style.opacity = dot.style.opacity = 1;
-    $("#cRead").textContent = i ? `Installment ${list[i - 1].period}: balance ${baht(bal[i])}, due ${fmtDate(list[i - 1].dueDate)}` : `Start: ${baht(price)}`;
+    $("#cRead").textContent = i ? `Installment ${list[i - 1].period}: balance ${baht(bal[i])}` : `Start: ${baht(price)}`;
   };
   hit.onpointerleave = () => { line.style.opacity = dot.style.opacity = 0; $("#cRead").textContent = "Hover the chart for details"; };
 }
@@ -420,17 +425,17 @@ function render() {
   const { loan, installments: list } = state;
   const next = list.find((i) => !i.paid);
   const total = list.reduce((s, i) => s + (i.amount ?? 0), 0);
-  const today = new Date().toISOString().slice(0, 10);
   const pct = loan.totalPeriods ? Math.round((loan.paidPeriods / loan.totalPeriods) * 100) : 0;
 
   $("#hName").textContent = loan.title;
   $("#chip").className = "chip" + (next ? "" : " done");
-  $("#chip").textContent = next ? `Next payment: installment ${next.period}` + (next.dueDate ? `, due ${fmtDate(next.dueDate)}` : "") : "All installments paid";
+  $("#chip").textContent = next ? `Next payment: installment ${next.period}` : "All installments paid";
   $("#fPrice").textContent = baht(loan.price);
   const freq = {}; list.forEach((i) => (freq[i.amount] = (freq[i.amount] || 0) + 1));
   $("#fMonthly").textContent = baht(+Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0] || 0);
   $("#fTotal").textContent = loan.totalPeriods + " months";
-  $("#fLate").textContent = list.filter((i) => !i.paid && i.dueDate && i.dueDate < today).length + " installments";
+  const lastPaid = list.filter((i) => i.paid && i.dueDate).map((i) => i.dueDate).sort().at(-1);
+  $("#fLast").textContent = lastPaid ? fmtDate(lastPaid) : "-";
   const frac = loan.price ? Math.min(1, loan.amountPaid / loan.price) : 0;
   $("#dArc").setAttribute("stroke-dashoffset", 100 - frac * 100);
   $("#dPct").textContent = Math.round(frac * 100) + "%";
@@ -450,18 +455,18 @@ function render() {
   for (let y = 0; y * 12 < list.length; y++) {
     const part = list.slice(y * 12, y * 12 + 12);
     years += `<div class="year"><span class="yl">Year ${y + 1}</span><div class="months">${part.map((i) =>
-      `<span class="m ${i.paid ? "paid" : i === next ? "next" : ""} ${i.period == popped ? "pop" : ""}" title="Installment ${i.period}: ${baht(i.amount)}, due ${fmtDate(i.dueDate)}" aria-label="Installment ${i.period}, ${i.paid ? "paid" : "unpaid"}">${i.period}</span>`).join("")}</div>
+      `<span class="m ${i.paid ? "paid" : i === next ? "next" : ""} ${i.period == popped ? "pop" : ""}" title="Installment ${i.period}: ${baht(i.amount)}${i.paid && i.dueDate ? ", paid " + fmtDate(i.dueDate) : ""}" aria-label="Installment ${i.period}, ${i.paid ? "paid" : "unpaid"}">${i.period}</span>`).join("")}</div>
       <span class="yr num">${part.filter((i) => i.paid).length}/${part.length} paid</span></div>`;
   }
-  $("#years").innerHTML = years || `<div class="empty">No installments yet. Click "+ Add installment" to start.</div>`;
+  $("#years").innerHTML = years || `<div class="empty">No installments yet.</div>`;
+  drawYears(list); // redraw now that the month rows have their final height, so the bar labels are not scaled down
 
 
   const rows = list;
   $("#rows").innerHTML = rows.length ? rows.map((i) => {
-    const late = !i.paid && i.dueDate && i.dueDate < today;
     return `<tr class="${i.paid ? "paid" : ""} ${i === next ? "nextrow" : ""}" data-p="${i.period}">
-      <td class="pno num">Installment ${i.period}${late ? '<span class="badge late">Overdue</span>' : i === next ? '<span class="badge next">Next</span>' : ""}</td>
-      <td class="num">${fmtDate(i.dueDate)}</td><td class="num" style="text-align:right">${baht(i.amount)}</td>
+      <td class="pno num">Installment ${i.period}${i === next ? '<span class="badge next">Next</span>' : ""}</td>
+      <td class="num">${i.paid ? fmtDate(i.dueDate) : "-"}</td><td class="num" style="text-align:right">${baht(i.amount)}</td>
       <td><span class="pill ${i.paid ? "paid" : ""}">${i.paid ? "Paid" : "Unpaid"}</span></td>
       </tr>`;
   }).join("") : `<tr><td colspan="4" class="empty">No installments yet</td></tr>`;
